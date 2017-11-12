@@ -1,0 +1,12 @@
+[
+	{
+		"ID": 0,
+		"SpriteSheetName": "chest_male",
+		"EquipType": "Chestwear"
+	},
+	{
+		"ID": 1,
+		"SpriteSheetName": "plate_chest_male",
+		"EquipType": "Chestwear"
+	}
+]
