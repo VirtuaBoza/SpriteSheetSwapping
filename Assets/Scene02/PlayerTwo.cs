@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public class PlayerTwo : MonoBehaviour
@@ -9,160 +8,30 @@ public class PlayerTwo : MonoBehaviour
 
     public Dictionary<EquipType, int> equippedItemIDByType;
 
-    private Animator playerAnimator;
-    private Animator[] childAnimators;
-    private ItemDatabase itemDatabase;
-    private Dictionary<Equipper, bool> isEquippedByEquipper;
+    private PlayerItemSpriteEquipper[] equippers;
 
     void Start()
     {
-        playerAnimator = GetComponent<Animator>();
-        childAnimators = GetComponentsInChildren<Animator>();
-        itemDatabase = FindObjectOfType<ItemDatabase>();
-
-        equippedItemIDByType = new Dictionary<EquipType, int>();
-        equippedItemIDByType.Add(EquipType.Chestwear, 0); ////////////////////////// For testing TEST TEST TEST
-
-        BaselineIsEquippedByEquipper();
-        
+        equippers = GetComponentsInChildren<PlayerItemSpriteEquipper>();
+        BaselineEquippedItemIDByType();
+        equippedItemIDByType[EquipType.Chestwear] = 0; ////////////////////////// For testing TEST TEST TEST
         EquipItemSprites();
     }
 
-    private void BaselineIsEquippedByEquipper()
+    private void BaselineEquippedItemIDByType()
     {
-        isEquippedByEquipper = new Dictionary<Equipper, bool>();
-        foreach (Equipper equipper in transform.GetComponentsInChildren<Equipper>())
+        equippedItemIDByType = new Dictionary<EquipType, int>();
+        foreach (EquipType equipType in Enum.GetValues(typeof(EquipType)))
         {
-            isEquippedByEquipper.Add(equipper, false);
+            equippedItemIDByType.Add(equipType, -1);
         }
     }
 
-    private void EquipItemSprites()
+    public void EquipItemSprites()
     {
-        foreach (Equipper equipper in transform.GetComponentsInChildren<Equipper>())
+        foreach (PlayerItemSpriteEquipper equipper in transform.GetComponentsInChildren<PlayerItemSpriteEquipper>())
         {
-            if (equippedItemIDByType.ContainsKey(equipper.equipType))
-            {
-                isEquippedByEquipper[equipper] = true;
-                equipper.GetComponent<Animator>().runtimeAnimatorController = CreateEquipmentAnimator(equipper.equipType);
-            }
-            else
-            {
-                isEquippedByEquipper[equipper] = false;
-                equipper.GetComponent<Animator>().runtimeAnimatorController = new RuntimeAnimatorController();
-            }
-        }
-    }
-
-    private AnimatorController CreateEquipmentAnimator(EquipType equipType)
-    {
-        AnimatorController playerAnimatorController = playerAnimator.runtimeAnimatorController as AnimatorController;
-        AnimatorController newController = new AnimatorController();
-        newController.name = "newController";
-        newController.AddLayer(newController.MakeUniqueLayerName("BaseLayer"));
-
-        AddPlayerAnimatorParametersToNewController(newController);
-        AddPlayerAnimatorStatesToNewController(playerAnimatorController, newController, equipType);
-        AddPlayerAnimatorTransitionsToNewController(playerAnimatorController, newController);
-
-        return newController;
-    }
-    
-    private void AddPlayerAnimatorParametersToNewController(AnimatorController newController)
-    {
-        foreach (AnimatorControllerParameter param in playerAnimator.parameters)
-        {
-            newController.AddParameter(param.name, param.type);
-        }
-    }
-
-    private void AddPlayerAnimatorStatesToNewController(AnimatorController playerAnimatorController, AnimatorController newController, EquipType equipType)
-    {
-        AnimatorStateMachine rootStateMachine = newController.layers[0].stateMachine;
-        foreach (ChildAnimatorState playerAnimatorState in playerAnimatorController.layers[0].stateMachine.states)
-        {
-            AnimatorState animatorState = new AnimatorState();
-            animatorState.name = playerAnimatorState.state.name;
-
-            animatorState.motion = GetAppropriateAnimationClip(equipType, animatorState.name);
-
-            rootStateMachine.AddState(animatorState, playerAnimatorState.position);
-
-            if (playerAnimator.GetCurrentAnimatorStateInfo(0).IsName(playerAnimatorState.state.name))
-            {
-                rootStateMachine.defaultState = animatorState;
-            }
-        }
-    }
-
-    private AnimationClip GetAppropriateAnimationClip(EquipType equipType, string animStateName)
-    {
-        AnimationType animType;
-        if (!Enum.IsDefined(typeof(AnimationType), animStateName))
-        {
-            Debug.LogWarning("Trouble in Equipper");
-            animType = AnimationType.Fall;
-        }
-        else
-        {
-            animType = (AnimationType)Enum.Parse(typeof(AnimationType), animStateName);
-        }
-        return itemDatabase.itemsDictionary[equippedItemIDByType[equipType]].AnimClipDictionary[animType];
-    }
-
-    private void AddPlayerAnimatorTransitionsToNewController(AnimatorController playerAnimatorController, AnimatorController newController)
-    {
-        AnimatorStateMachine rootStateMachine = newController.layers[0].stateMachine;
-        foreach (ChildAnimatorState playerAnimatorState in playerAnimatorController.layers[0].stateMachine.states)
-        {
-            foreach (ChildAnimatorState newAnimatorState in rootStateMachine.states)
-            {
-                if (playerAnimatorState.state.name == newAnimatorState.state.name)
-                {
-                    foreach (AnimatorStateTransition playerStateTransition in playerAnimatorState.state.transitions)
-                    {
-                        AnimatorStateTransition newStateTransition = new AnimatorStateTransition();
-
-                        newStateTransition.name = playerStateTransition.name;
-                        newStateTransition.hasExitTime = playerStateTransition.hasExitTime;
-                        newStateTransition.canTransitionToSelf = playerStateTransition.canTransitionToSelf;
-                        newStateTransition.conditions = playerStateTransition.conditions;
-                        newStateTransition.duration = playerStateTransition.duration;
-
-                        string nameOfDestinationState = playerStateTransition.destinationState.name;
-                        foreach (ChildAnimatorState animatorState in rootStateMachine.states)
-                        {
-                            if (animatorState.state.name == nameOfDestinationState)
-                            {
-                                newStateTransition.destinationState = animatorState.state;
-                                break;
-                            }
-                        }
-                        newAnimatorState.state.AddTransition(newStateTransition);
-                    }
-                    break;
-                }
-            }
-        }
-
-        foreach (AnimatorStateTransition playerStateTransition in playerAnimatorController.layers[0].stateMachine.anyStateTransitions)
-        {
-            string nameOfDestinationState = playerStateTransition.destinationState.name;
-            AnimatorState destinationState = new AnimatorState();
-            foreach (ChildAnimatorState animatorState in rootStateMachine.states)
-            {
-                if (animatorState.state.name == nameOfDestinationState)
-                {
-                    destinationState = animatorState.state;
-                    break;
-                }
-            }
-            AnimatorStateTransition newStateTransition = rootStateMachine.AddAnyStateTransition(destinationState);
-            newStateTransition.name = playerStateTransition.name;
-            newStateTransition.hasExitTime = playerStateTransition.hasExitTime;
-            newStateTransition.canTransitionToSelf = playerStateTransition.canTransitionToSelf;
-            newStateTransition.conditions = playerStateTransition.conditions;
-            newStateTransition.duration = playerStateTransition.duration;
+            equipper.CreateItemAnimatorFromPlayerAnimator(equippedItemIDByType[equipper.equipType], GetComponent<Animator>());
         }
     }
 
@@ -201,12 +70,12 @@ public class PlayerTwo : MonoBehaviour
 
         GetComponent<Animator>().SetFloat("horizontalAxis", x);
         GetComponent<Animator>().SetFloat("verticalAxis", y);
-        foreach (Equipper equipper in GetComponentsInChildren<Equipper>())
+        foreach (PlayerItemSpriteEquipper equipper in equippers)
         {
-            if (isEquippedByEquipper[equipper])
+            if (equipper.hasItemEquipped)
             {
-                equipper.GetComponent<Animator>().SetFloat("horizontalAxis", x);
-                equipper.GetComponent<Animator>().SetFloat("verticalAxis", y);
+                equipper.animator.SetFloat("horizontalAxis", x);
+                equipper.animator.SetFloat("verticalAxis", y);
             }
         }
     }
