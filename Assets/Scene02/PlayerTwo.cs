@@ -88,7 +88,7 @@ public class PlayerTwo : MonoBehaviour
 
             rootStateMachine.AddState(animatorState, playerAnimatorState.position);
 
-            if (playerAnimatorState.state == playerAnimatorController.layers[0].stateMachine.defaultState)
+            if (playerAnimator.GetCurrentAnimatorStateInfo(0).IsName(playerAnimatorState.state.name))
             {
                 rootStateMachine.defaultState = animatorState;
             }
