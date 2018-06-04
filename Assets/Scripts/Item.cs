@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Item
 {
-    private const float framesPerSecond = 8;
+    private const float framesPerSecond = 8f;
     private EquipType equipType;
     public string spriteSheetName;
 
