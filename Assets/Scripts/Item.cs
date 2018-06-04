@@ -8,8 +8,9 @@ public class Item
 {
     private const float framesPerSecond = 8;
     private EquipType equipType;
+    public string spriteSheetName;
+
     public int ID { get; private set; }
-    public string SpriteSheetName { get; private set; }
     public EquipType EquipType => equipType;
     public Dictionary<AnimationType, AnimationClip> AnimClipDictionary 
     { get; private set; }
@@ -22,7 +23,7 @@ public class Item
         }
 
         ID = id;
-        SpriteSheetName = spriteSheetName;
+        this.spriteSheetName = spriteSheetName;
 
         AnimClipDictionary = 
             new Dictionary<AnimationType, AnimationClip>();
@@ -33,14 +34,14 @@ public class Item
     private void CreateAnimationClips()
     {
         var sprites = Resources.LoadAll<Sprite>("Spritesheets/" + 
-            SpriteSheetName);
+            spriteSheetName);
 
         foreach (AnimationType animationType in Enum.GetValues(
             typeof(AnimationType)))
         {
             var animClip = new AnimationClip
             {
-                name = $"{SpriteSheetName} {animationType}"
+                name = $"{spriteSheetName} {animationType}"
             };
 
             var spriteBinding = new EditorCurveBinding
