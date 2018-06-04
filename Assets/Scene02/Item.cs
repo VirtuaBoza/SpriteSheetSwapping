@@ -76,7 +76,7 @@ public class Item
                 spriteKeyFrames[i] = new ObjectReferenceKeyframe();
                 spriteKeyFrames[i].time = timeValue;
                 spriteKeyFrames[i].value = sprites[i + startAndRange[0]];
-                timeValue += 1 / 15f;
+                timeValue += 1 / 8f;
             }
             AnimationUtility.SetObjectReferenceCurve(animClip, spriteBinding, spriteKeyFrames);
             
@@ -84,7 +84,7 @@ public class Item
             animClipSett.loopTime = true;
             
             AnimationUtility.SetAnimationClipSettings(animClip, animClipSett);
-            animClip.frameRate = 15f;
+            animClip.frameRate = 8f;
             AnimClipDictionary.Add(animationType, animClip);
         }
     }
