@@ -5,14 +5,12 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float playerSpeed = 3;
-
     public Dictionary<EquipType, int> equippedItemIDByType;
-
-    private PlayerItemSpriteEquipper[] equippers;
+    private Equipper[] equippers;
 
     void Start()
     {
-        equippers = GetComponentsInChildren<PlayerItemSpriteEquipper>();
+        equippers = GetComponentsInChildren<Equipper>();
         BaselineEquippedItemIDByType();
 
         // TEST TEST TEST
@@ -33,7 +31,7 @@ public class Player : MonoBehaviour
 
     public void EquipItemSprites()
     {
-        foreach (PlayerItemSpriteEquipper equipper in transform.GetComponentsInChildren<PlayerItemSpriteEquipper>())
+        foreach (Equipper equipper in transform.GetComponentsInChildren<Equipper>())
         {
             equipper.CreateItemAnimatorFromPlayerAnimator(equippedItemIDByType[equipper.equipType], GetComponent<Animator>());
         }
@@ -73,7 +71,7 @@ public class Player : MonoBehaviour
 
         GetComponent<Animator>().SetFloat("horizontalAxis", x);
         GetComponent<Animator>().SetFloat("verticalAxis", y);
-        foreach (PlayerItemSpriteEquipper equipper in equippers)
+        foreach (Equipper equipper in equippers)
         {
             if (equipper.hasItemEquipped)
             {

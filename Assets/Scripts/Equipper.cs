@@ -2,7 +2,7 @@
 using UnityEditor.Animations;
 using UnityEngine;
 
-public class PlayerItemSpriteEquipper : MonoBehaviour
+public class Equipper : MonoBehaviour
 {
     public Animator animator;
     public EquipType equipType;
@@ -21,8 +21,10 @@ public class PlayerItemSpriteEquipper : MonoBehaviour
         if (itemID >= 0)
         {
             hasItemEquipped = true;
-            AnimatorController newController = new AnimatorController();
-            newController.name = "newController";
+            var newController = new AnimatorController
+            {
+                name = "newController"
+            };
             newController.AddLayer(newController.MakeUniqueLayerName("BaseLayer"));
 
             AddPlayerAnimatorParametersToNewController(playerAnimator, newController);
