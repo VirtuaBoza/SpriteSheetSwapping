@@ -34,7 +34,7 @@ public class PlayerItemSpriteEquipper : MonoBehaviour
         else
         {
             hasItemEquipped = false;
-            GetComponent<Animator>().runtimeAnimatorController = new RuntimeAnimatorController();
+            GetComponent<Animator>().runtimeAnimatorController = null;
         }
     }
 
