@@ -16,7 +16,8 @@ public class Equipper : MonoBehaviour
         itemDatabase = FindObjectOfType<ItemDatabase>();
     }
 
-    public void CreateItemAnimatorFromPlayerAnimator(int itemID, Animator playerAnimator)
+    public void CreateItemAnimatorFromPlayerAnimator(int itemID, 
+        Animator playerAnimator)
     {
         if (itemID >= 0)
         {
@@ -25,13 +26,20 @@ public class Equipper : MonoBehaviour
             {
                 name = "newController"
             };
-            newController.AddLayer(newController.MakeUniqueLayerName("BaseLayer"));
+            newController.AddLayer(
+                newController.MakeUniqueLayerName("BaseLayer"));
 
-            AddPlayerAnimatorParametersToNewController(playerAnimator, newController);
-            AddPlayerAnimatorStatesToNewController(playerAnimator, newController, itemID);
-            AddPlayerAnimatorTransitionsToNewController(playerAnimator, newController);
+            AddPlayerAnimatorParametersToNewController(
+                playerAnimator, newController);
 
-            GetComponent<Animator>().runtimeAnimatorController = newController;
+            AddPlayerAnimatorStatesToNewController(
+                playerAnimator, newController, itemID);
+
+            AddPlayerAnimatorTransitionsToNewController(
+                playerAnimator, newController);
+
+            GetComponent<Animator>().runtimeAnimatorController = 
+                newController;
         }
         else
         {
@@ -40,89 +48,125 @@ public class Equipper : MonoBehaviour
         }
     }
 
-    private void AddPlayerAnimatorParametersToNewController(Animator playerAnimator, AnimatorController newController)
+    private void AddPlayerAnimatorParametersToNewController(
+        Animator playerAnimator, AnimatorController newController)
     {
-        foreach (AnimatorControllerParameter param in playerAnimator.parameters)
+        foreach (var param in playerAnimator.parameters)
         {
             newController.AddParameter(param.name, param.type);
         }
     }
 
-    private void AddPlayerAnimatorStatesToNewController(Animator playerAnimator, AnimatorController newController, int itemID)
+    private void AddPlayerAnimatorStatesToNewController(
+        Animator playerAnimator, 
+        AnimatorController newController, 
+        int itemID)
     {
-        AnimatorController playerAnimatorController = playerAnimator.runtimeAnimatorController as AnimatorController;
-        AnimatorStateMachine rootStateMachine = newController.layers[0].stateMachine;
-        foreach (ChildAnimatorState playerAnimatorState in playerAnimatorController.layers[0].stateMachine.states)
+        var playerAnimatorController = 
+            (AnimatorController)playerAnimator
+            .runtimeAnimatorController;
+
+        var rootStateMachine = 
+            newController.layers[0].stateMachine;
+
+        foreach (var playerAnimatorState in 
+            playerAnimatorController.layers[0].stateMachine.states)
         {
             AnimatorState animatorState = new AnimatorState();
             animatorState.name = playerAnimatorState.state.name;
 
-            animatorState.motion = GetAppropriateAnimationClip(animatorState.name, itemID);
+            animatorState.motion = GetAppropriateAnimationClip(
+                animatorState.name, itemID);
 
-            rootStateMachine.AddState(animatorState, playerAnimatorState.position);
+            rootStateMachine.AddState(animatorState, 
+                playerAnimatorState.position);
 
-            if (playerAnimator.GetCurrentAnimatorStateInfo(0).IsName(playerAnimatorState.state.name))
+            if (playerAnimator.GetCurrentAnimatorStateInfo(0)
+                .IsName(playerAnimatorState.state.name))
             {
                 rootStateMachine.defaultState = animatorState;
             }
         }
     }
 
-    private Motion GetAppropriateAnimationClip(string stateName, int itemID)
+    private Motion GetAppropriateAnimationClip(string stateName, 
+        int itemID)
     {
         AnimationType animType;
-        if (!Enum.IsDefined(typeof(AnimationType), stateName))
+        if (!Enum.TryParse(stateName, out animType))
         {
-            throw new ArgumentException("GetAppropriateAnimationClip was passed a state name from which an AnimationType cannot be parsed.");
+            throw new ArgumentException("GetAppropriateAnimationClip " +
+            "was passed a state name from which an AnimationType " +
+            "cannot be parsed.");
         }
-        else
-        {
-            animType = (AnimationType)Enum.Parse(typeof(AnimationType), stateName);
-        }
-        return itemDatabase.itemsDictionary[itemID].AnimClipDictionary[animType];
+
+        return itemDatabase.itemsDictionary[itemID]
+            .AnimClipDictionary[animType];
     }
 
-    private void AddPlayerAnimatorTransitionsToNewController(Animator playerAnimator, AnimatorController newController)
+    private void AddPlayerAnimatorTransitionsToNewController(
+        Animator playerAnimator, AnimatorController newController)
     {
-        AnimatorController playerAnimatorController = playerAnimator.runtimeAnimatorController as AnimatorController;
-        AnimatorStateMachine rootStateMachine = newController.layers[0].stateMachine;
-        foreach (ChildAnimatorState playerAnimatorState in playerAnimatorController.layers[0].stateMachine.states)
+        var playerAnimatorController = 
+            (AnimatorController)playerAnimator
+            .runtimeAnimatorController;
+
+        var rootStateMachine = newController.layers[0].stateMachine;
+
+        foreach (var playerAnimatorState in 
+            playerAnimatorController.layers[0].stateMachine.states)
         {
-            foreach (ChildAnimatorState newAnimatorState in rootStateMachine.states)
+            foreach (var newAnimatorState in rootStateMachine.states)
             {
-                if (playerAnimatorState.state.name == newAnimatorState.state.name)
+                if (playerAnimatorState.state.name == 
+                    newAnimatorState.state.name)
                 {
-                    foreach (AnimatorStateTransition playerStateTransition in playerAnimatorState.state.transitions)
+                    foreach (var playerStateTransition in 
+                        playerAnimatorState.state.transitions)
                     {
-                        AnimatorStateTransition newStateTransition = new AnimatorStateTransition();
-
-                        newStateTransition.name = playerStateTransition.name;
-                        newStateTransition.hasExitTime = playerStateTransition.hasExitTime;
-                        newStateTransition.canTransitionToSelf = playerStateTransition.canTransitionToSelf;
-                        newStateTransition.conditions = playerStateTransition.conditions;
-                        newStateTransition.duration = playerStateTransition.duration;
-
-                        string nameOfDestinationState = playerStateTransition.destinationState.name;
-                        foreach (ChildAnimatorState animatorState in rootStateMachine.states)
+                        var newStateTransition = 
+                            new AnimatorStateTransition
                         {
-                            if (animatorState.state.name == nameOfDestinationState)
+                            name = playerStateTransition
+                                .name,
+                            hasExitTime = playerStateTransition
+                                .hasExitTime,
+                            canTransitionToSelf = playerStateTransition
+                                .canTransitionToSelf,
+                            conditions = playerStateTransition
+                                .conditions,
+                            duration = playerStateTransition
+                                .duration
+                        };
+
+                        var nameOfDestinationState = 
+                            playerStateTransition.destinationState.name;
+                        foreach (var animatorState in 
+                            rootStateMachine.states)
+                        {
+                            if (animatorState.state.name == 
+                                nameOfDestinationState)
                             {
-                                newStateTransition.destinationState = animatorState.state;
+                                newStateTransition.destinationState = 
+                                    animatorState.state;
                                 break;
                             }
                         }
-                        newAnimatorState.state.AddTransition(newStateTransition);
+                        newAnimatorState.state.AddTransition(
+                            newStateTransition);
                     }
                     break;
                 }
             }
         }
 
-        foreach (AnimatorStateTransition playerStateTransition in playerAnimatorController.layers[0].stateMachine.anyStateTransitions)
+        foreach (var playerStateTransition in playerAnimatorController
+            .layers[0].stateMachine.anyStateTransitions)
         {
-            string nameOfDestinationState = playerStateTransition.destinationState.name;
-            AnimatorState destinationState = new AnimatorState();
-            foreach (ChildAnimatorState animatorState in rootStateMachine.states)
+            var nameOfDestinationState = 
+                playerStateTransition.destinationState.name;
+            var destinationState = new AnimatorState();
+            foreach (var animatorState in rootStateMachine.states)
             {
                 if (animatorState.state.name == nameOfDestinationState)
                 {
@@ -130,12 +174,19 @@ public class Equipper : MonoBehaviour
                     break;
                 }
             }
-            AnimatorStateTransition newStateTransition = rootStateMachine.AddAnyStateTransition(destinationState);
-            newStateTransition.name = playerStateTransition.name;
-            newStateTransition.hasExitTime = playerStateTransition.hasExitTime;
-            newStateTransition.canTransitionToSelf = playerStateTransition.canTransitionToSelf;
-            newStateTransition.conditions = playerStateTransition.conditions;
-            newStateTransition.duration = playerStateTransition.duration;
+            var newStateTransition = 
+                rootStateMachine
+                .AddAnyStateTransition(destinationState);
+            newStateTransition.name = 
+                playerStateTransition.name;
+            newStateTransition.hasExitTime = 
+                playerStateTransition.hasExitTime;
+            newStateTransition.canTransitionToSelf = 
+                playerStateTransition.canTransitionToSelf;
+            newStateTransition.conditions = 
+                playerStateTransition.conditions;
+            newStateTransition.duration = 
+                playerStateTransition.duration;
         }
     }
 }

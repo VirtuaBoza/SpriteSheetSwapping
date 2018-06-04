@@ -23,7 +23,8 @@ public class Player : MonoBehaviour
     private void BaselineEquippedItemIDByType()
     {
         equippedItemIDByType = new Dictionary<EquipType, int>();
-        foreach (EquipType equipType in Enum.GetValues(typeof(EquipType)))
+        foreach (EquipType equipType in Enum.GetValues(
+            typeof(EquipType)))
         {
             equippedItemIDByType.Add(equipType, -1);
         }
@@ -31,9 +32,12 @@ public class Player : MonoBehaviour
 
     public void EquipItemSprites()
     {
-        foreach (Equipper equipper in transform.GetComponentsInChildren<Equipper>())
+        foreach (Equipper equipper in 
+            GetComponentsInChildren<Equipper>())
         {
-            equipper.CreateItemAnimatorFromPlayerAnimator(equippedItemIDByType[equipper.equipType], GetComponent<Animator>());
+            equipper.CreateItemAnimatorFromPlayerAnimator(
+                equippedItemIDByType[equipper.equipType], 
+                GetComponent<Animator>());
         }
     }
 
@@ -60,7 +64,8 @@ public class Player : MonoBehaviour
     {
         float x = 0;
         float y = 0;
-        if (Mathf.Abs(Input.GetAxis("Horizontal")) > Mathf.Abs(Input.GetAxis("Vertical")))
+        if (Mathf.Abs(Input.GetAxis("Horizontal")) > 
+            Mathf.Abs(Input.GetAxis("Vertical")))
         {
             x = Input.GetAxis("Horizontal");
         }
@@ -83,12 +88,16 @@ public class Player : MonoBehaviour
 
     private void MovePlayer()
     {
-        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        if (Input.GetAxis("Horizontal") != 0 || 
+            Input.GetAxis("Vertical") != 0)
         {
             float moveX = Input.GetAxis("Horizontal");
             float moveY = Input.GetAxis("Vertical");
-            float xAndY = Mathf.Sqrt(Mathf.Pow(moveX, 2) + Mathf.Pow(moveY, 2));
-            transform.Translate(moveX * playerSpeed * Time.deltaTime / xAndY, moveY * playerSpeed * Time.deltaTime / xAndY, transform.position.z, Space.Self);
+            float xAndY = Mathf.Sqrt(Mathf.Pow(moveX, 2) + 
+                Mathf.Pow(moveY, 2));
+            transform.Translate(moveX * playerSpeed * Time.deltaTime / 
+                xAndY, moveY * playerSpeed * Time.deltaTime / 
+                xAndY, transform.position.z, Space.Self);
         }
     }
 }

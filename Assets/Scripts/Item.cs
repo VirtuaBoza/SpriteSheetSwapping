@@ -10,7 +10,8 @@ public class Item
     public int ID { get; private set; }
     public string SpriteSheetName { get; private set; }
     public EquipType EquipType => equipType;
-    public Dictionary<AnimationType, AnimationClip> AnimClipDictionary { get; private set; }
+    public Dictionary<AnimationType, AnimationClip> AnimClipDictionary 
+    { get; private set; }
 
     public Item(int id, string spriteSheetName, string equipTypeString)
     {
@@ -22,16 +23,19 @@ public class Item
         ID = id;
         SpriteSheetName = spriteSheetName;
 
-        AnimClipDictionary = new Dictionary<AnimationType, AnimationClip>();
+        AnimClipDictionary = 
+            new Dictionary<AnimationType, AnimationClip>();
 
         CreateAnimationClips();
     }
 
     private void CreateAnimationClips()
     {
-        var sprites = Resources.LoadAll<Sprite>("Spritesheets/" + SpriteSheetName);
+        var sprites = Resources.LoadAll<Sprite>("Spritesheets/" + 
+            SpriteSheetName);
 
-        foreach (AnimationType animationType in Enum.GetValues(typeof(AnimationType)))
+        foreach (AnimationType animationType in Enum.GetValues(
+            typeof(AnimationType)))
         {
             var animClip = new AnimationClip
             {
@@ -45,30 +49,36 @@ public class Item
                 propertyName = "m_Sprite"
             };
 
-            var startAndRange = GetSpriteStartIndexAndRange(animationType);
-            var spriteKeyFrames = new ObjectReferenceKeyframe[startAndRange.Range];
+            var startAndRange = GetSpriteStartIndexAndRange(
+                animationType);
+            var spriteKeyFrames = 
+                new ObjectReferenceKeyframe[startAndRange.Range];
             float timeValue = 0;
             for (int i = 0; i < startAndRange.Range; i++)
             {
                 spriteKeyFrames[i] = new ObjectReferenceKeyframe();
                 spriteKeyFrames[i].time = timeValue;
-                spriteKeyFrames[i].value = sprites[i + startAndRange.StartIndex];
+                spriteKeyFrames[i].value = 
+                    sprites[i + startAndRange.StartIndex];
                 timeValue += 1 / 8f;
             }
-            AnimationUtility.SetObjectReferenceCurve(animClip, spriteBinding, spriteKeyFrames);
+            AnimationUtility.SetObjectReferenceCurve(
+                animClip, spriteBinding, spriteKeyFrames);
             
             var animClipSettings = new AnimationClipSettings
             {
                 loopTime = true
             };
             
-            AnimationUtility.SetAnimationClipSettings(animClip, animClipSettings);
+            AnimationUtility.SetAnimationClipSettings(
+                animClip, animClipSettings);
             animClip.frameRate = 8f;
             AnimClipDictionary.Add(animationType, animClip);
         }
     }
 
-    private SpriteSheetAnimationInfo GetSpriteStartIndexAndRange(AnimationType animationType)
+    private SpriteSheetAnimationInfo GetSpriteStartIndexAndRange(
+        AnimationType animationType)
     {
         switch (animationType)
         {
