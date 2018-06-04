@@ -23,27 +23,30 @@ public class Item
         SpriteSheetName = spriteSheetName;
 
         AnimClipDictionary = new Dictionary<AnimationType, AnimationClip>();
-        
+
         CreateAnimationClips();
     }
 
     private void CreateAnimationClips()
     {
-        Sprite[] sprites = Resources.LoadAll<Sprite>("Spritesheets/" + SpriteSheetName);
+        var sprites = Resources.LoadAll<Sprite>("Spritesheets/" + SpriteSheetName);
 
         foreach (AnimationType animationType in Enum.GetValues(typeof(AnimationType)))
         {
-            var animClip = new AnimationClip();
-            animClip.name = $"{SpriteSheetName} {animationType}";
-            
+            var animClip = new AnimationClip
+            {
+                name = $"{SpriteSheetName} {animationType}"
+            };
 
-            EditorCurveBinding spriteBinding = new EditorCurveBinding();
-            spriteBinding.type = typeof(SpriteRenderer);
-            spriteBinding.path = "";
-            spriteBinding.propertyName = "m_Sprite";
+            var spriteBinding = new EditorCurveBinding
+            {
+                type = typeof(SpriteRenderer),
+                path = string.Empty,
+                propertyName = "m_Sprite"
+            };
 
             var startAndRange = GetSpriteStartIndexAndRange(animationType);
-            ObjectReferenceKeyframe[] spriteKeyFrames = new ObjectReferenceKeyframe[startAndRange.Range];
+            var spriteKeyFrames = new ObjectReferenceKeyframe[startAndRange.Range];
             float timeValue = 0;
             for (int i = 0; i < startAndRange.Range; i++)
             {
@@ -54,10 +57,12 @@ public class Item
             }
             AnimationUtility.SetObjectReferenceCurve(animClip, spriteBinding, spriteKeyFrames);
             
-            AnimationClipSettings animClipSett = new AnimationClipSettings();
-            animClipSett.loopTime = true;
+            var animClipSettings = new AnimationClipSettings
+            {
+                loopTime = true
+            };
             
-            AnimationUtility.SetAnimationClipSettings(animClip, animClipSett);
+            AnimationUtility.SetAnimationClipSettings(animClip, animClipSettings);
             animClip.frameRate = 8f;
             AnimClipDictionary.Add(animationType, animClip);
         }
