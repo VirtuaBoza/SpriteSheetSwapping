@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Item
 {
+    private const float framesPerSecond = 8;
     private EquipType equipType;
     public int ID { get; private set; }
     public string SpriteSheetName { get; private set; }
@@ -60,7 +61,7 @@ public class Item
                 spriteKeyFrames[i].time = timeValue;
                 spriteKeyFrames[i].value = 
                     sprites[i + startAndRange.StartIndex];
-                timeValue += 1 / 8f;
+                timeValue += 1 / framesPerSecond;
             }
             AnimationUtility.SetObjectReferenceCurve(
                 animClip, spriteBinding, spriteKeyFrames);
@@ -72,7 +73,7 @@ public class Item
             
             AnimationUtility.SetAnimationClipSettings(
                 animClip, animClipSettings);
-            animClip.frameRate = 8f;
+            animClip.frameRate = framesPerSecond;
             AnimClipDictionary.Add(animationType, animClip);
         }
     }
