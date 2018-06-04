@@ -6,26 +6,24 @@ using UnityEngine;
 
 public class Item
 {
+    private EquipType equipType;
     public int ID { get; private set; }
     public string SpriteSheetName { get; private set; }
-    public EquipType EquipType { get; private set; }
+    public EquipType EquipType => equipType;
     public Dictionary<AnimationType, AnimationClip> AnimClipDictionary { get; private set; }
 
     public Item(int id, string spriteSheetName, string equipTypeString)
     {
+        if(!Enum.TryParse(equipTypeString, out equipType))
+        {
+            throw new ArgumentException();
+        }
+
         ID = id;
         SpriteSheetName = spriteSheetName;
 
-        if (!Enum.IsDefined(typeof(EquipType), equipTypeString))
-        {
-            Debug.LogWarning("Trouble in Item constructor");
-        }
-        else
-        {
-            EquipType = (EquipType)Enum.Parse(typeof(EquipType), equipTypeString);
-        }
-
         AnimClipDictionary = new Dictionary<AnimationType, AnimationClip>();
+        
         CreateAnimationClips();
     }
 
@@ -35,8 +33,8 @@ public class Item
 
         foreach (AnimationType animationType in Enum.GetValues(typeof(AnimationType)))
         {
-            AnimationClip animClip = new AnimationClip();
-            animClip.name = SpriteSheetName + " " + animationType.ToString();
+            var animClip = new AnimationClip();
+            animClip.name = $"{SpriteSheetName} {animationType}";
             
 
             EditorCurveBinding spriteBinding = new EditorCurveBinding();
