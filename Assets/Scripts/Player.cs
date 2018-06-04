@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTwo : MonoBehaviour
+public class Player : MonoBehaviour
 {
     public float playerSpeed = 3;
 
@@ -14,7 +14,11 @@ public class PlayerTwo : MonoBehaviour
     {
         equippers = GetComponentsInChildren<PlayerItemSpriteEquipper>();
         BaselineEquippedItemIDByType();
-        equippedItemIDByType[EquipType.Chestwear] = 0; ////////////////////////// For testing TEST TEST TEST
+
+        // TEST TEST TEST
+        equippedItemIDByType[EquipType.Chestwear] = 0;
+        // END OF TEST
+
         EquipItemSprites();
     }
 
@@ -35,13 +39,12 @@ public class PlayerTwo : MonoBehaviour
         }
     }
 
-
     void Update()
     {
         AnimatePlayer();
         MovePlayer();
 
-        ////////THIS IS A TEST/////////////
+        // TEST TEST TEST
         if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             equippedItemIDByType[EquipType.Chestwear] = 0;
@@ -52,7 +55,7 @@ public class PlayerTwo : MonoBehaviour
             equippedItemIDByType[EquipType.Chestwear] = 1;
             EquipItemSprites();
         }
-        ////////END OF TEST////////////
+        // END OF TEST
     }
 
     private void AnimatePlayer()
