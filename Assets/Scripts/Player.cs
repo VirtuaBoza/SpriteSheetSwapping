@@ -7,10 +7,12 @@ public class Player : MonoBehaviour
     public float playerSpeed = 3;
     public Dictionary<EquipType, int> equippedItemIDByType;
     private Equipper[] equippers;
+    private Animator animator;
 
     void Start()
     {
         equippers = GetComponentsInChildren<Equipper>();
+        animator = GetComponent<Animator>();
         BaselineEquippedItemIDByType();
 
         // TEST TEST TEST
@@ -74,8 +76,8 @@ public class Player : MonoBehaviour
             y = Input.GetAxis("Vertical");
         }
 
-        GetComponent<Animator>().SetFloat("horizontalAxis", x);
-        GetComponent<Animator>().SetFloat("verticalAxis", y);
+        animator.SetFloat("horizontalAxis", x);
+        animator.SetFloat("verticalAxis", y);
         foreach (Equipper equipper in equippers)
         {
             if (equipper.hasItemEquipped)
